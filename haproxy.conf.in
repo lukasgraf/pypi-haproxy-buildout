@@ -48,7 +48,6 @@ backend pypi-mirrors
   # "check" enables health checks
   # "rise 1" means consider server up after 1 successful health check
   server  pypi-main        pypi.python.org:80    cookie ppmain check inter 5m fastinter 2s downinter 1m maxconn 2 rise 1 fall 1
-  server  pypi-mirror-b    b.pypi.python.org:80  cookie ppb    check inter 5m fastinter 2s downinter 1m maxconn 2 rise 1 fall 1
   server  pypi-mirror-c    c.pypi.python.org:80  cookie ppc    check inter 5m fastinter 2s downinter 1m maxconn 2 rise 1 fall 1
   server  pypi-mirror-d    d.pypi.python.org:80  cookie ppd    check inter 5m fastinter 2s downinter 1m maxconn 2 rise 1 fall 1
   server  pypi-mirror-e    e.pypi.python.org:80  cookie ppe    check inter 5m fastinter 2s downinter 1m maxconn 2 rise 1 fall 1
