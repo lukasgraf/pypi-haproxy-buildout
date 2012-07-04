@@ -32,10 +32,10 @@ frontend pypi
   bind ${haproxy-conf:bind}
   default_backend pypi-mirrors
 
-# Load balancing over the zope instances
+# Failover for PyPi
 backend pypi-mirrors
   # Add a cookie called "serverid" for maintaining session stickiness.
-  # This cookie lasts until the client's browser closes, and is invisible to Zope.
+  # This cookie lasts until the client's browser closes.
   cookie serverid insert nocache indirect
   # If no session found, use the roundrobin load-balancing algorithm to pick a backend.
   balance roundrobin
@@ -46,7 +46,7 @@ backend pypi-mirrors
   # "cookie" sets the value of the serverid cookie to be used for the server
   # "maxconn" is how many connections can be sent to the server at once
   # "check" enables health checks
-  # "rise 1" means consider Zope up after 1 successful health check
+  # "rise 1" means consider server up after 1 successful health check
   server  pypi-main        pypi.python.org:80    cookie ppmain check maxconn 2 rise 1
   server  pypi-mirror-b    b.pypi.python.org:80  cookie ppb    check maxconn 2 rise 1
   server  pypi-mirror-c    c.pypi.python.org:80  cookie ppc    check maxconn 2 rise 1
