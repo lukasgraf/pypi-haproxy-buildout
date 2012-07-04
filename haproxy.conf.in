@@ -12,7 +12,7 @@ defaults
   # Remove requests from the queue if people press stop button
   option abortonclose
   # Try to connect this many times on failure
-  retries 3
+  retries 10
   # If a client is bound to a particular backend but it goes down,
   # send them to a different one
   option redispatch
