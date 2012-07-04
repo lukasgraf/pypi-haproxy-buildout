@@ -11,6 +11,7 @@ defaults
   option httpclose
   # Remove requests from the queue if people press stop button
   option abortonclose
+  # option transparent
   # Try to connect this many times on failure
   retries 10
   # If a client is bound to a particular backend but it goes down,
@@ -28,17 +29,18 @@ defaults
   stats refresh 5m
   stats realm Haproxy\ statistics
 
+
+# The main frontend forwards requests to one sepcific mirror frontend.
+# This necessary for rewriting the Host header which is not possible with haproxy otherwise.
 frontend pypi
   bind ${haproxy-conf:bind}
   default_backend pypi-mirrors
 
-# Failover for PyPi
 backend pypi-mirrors
   # Add a cookie called "serverid" for maintaining session stickiness.
   # This cookie lasts until the client's browser closes.
   cookie serverid insert nocache indirect
-  # If no session found, use the roundrobin load-balancing algorithm to pick a backend.
-  balance roundrobin
+
   # Use / (the default) for periodic backend health checks
   option httpchk HEAD / HTTP/1.0
 
@@ -47,9 +49,73 @@ backend pypi-mirrors
   # "maxconn" is how many connections can be sent to the server at once
   # "check" enables health checks
   # "rise 1" means consider server up after 1 successful health check
-  server  pypi-main        pypi.python.org:80    cookie ppmain check inter 5m fastinter 2s downinter 1m maxconn 2 rise 1 fall 1
-  server  pypi-mirror-c    c.pypi.python.org:80  cookie ppc    check inter 5m fastinter 2s downinter 1m maxconn 2 rise 1 fall 1
-  server  pypi-mirror-d    d.pypi.python.org:80  cookie ppd    check inter 5m fastinter 2s downinter 1m maxconn 2 rise 1 fall 1
-  server  pypi-mirror-e    e.pypi.python.org:80  cookie ppe    check inter 5m fastinter 2s downinter 1m maxconn 2 rise 1 fall 1
-  server  pypi-mirror-f    f.pypi.python.org:80  cookie ppif   check inter 5m fastinter 2s downinter 1m maxconn 2 rise 1 fall 1
 
+  server  pypi-mirror-a    ${haproxy-conf:bind-pypia}  cookie ppa    check inter 5m fastinter 2s downinter 1m maxconn 2 rise 1 fall 1
+  server  pypi-mirror-c    ${haproxy-conf:bind-pypic}  cookie ppc    check inter 5m fastinter 2s downinter 1m maxconn 2 rise 1 fall 1
+  server  pypi-mirror-d    ${haproxy-conf:bind-pypid}  cookie ppd    check inter 5m fastinter 2s downinter 1m maxconn 2 rise 1 fall 1
+  server  pypi-mirror-e    ${haproxy-conf:bind-pypie}  cookie ppe    check inter 5m fastinter 2s downinter 1m maxconn 2 rise 1 fall 1
+  server  pypi-mirror-f    ${haproxy-conf:bind-pypif}  cookie ppf    check inter 5m fastinter 2s downinter 1m maxconn 2 rise 1 fall 1
+
+
+
+# a.pypi.python.org
+frontend pypia
+  bind ${haproxy-conf:bind-pypia}
+  default_backend pypia-backend
+
+backend pypia-backend
+  reqirep ^(.*)${haproxy-conf:bind-incoming}(.*) \1a.pypi.python.org\2
+  rspirep ^(Location:.*)a.pypi.python.org(.*) \1${haproxy-conf:bind-incoming}\2
+  server  pypia-server    a.pypi.python.org:80
+
+
+
+# b.pypi.python.org
+# This mirror is utterly broken. It does not support neither OPTION nor HEAD checks.
+
+
+# c.pypi.python.org
+frontend pypic
+  bind ${haproxy-conf:bind-pypic}
+  default_backend pypic-backend
+
+backend pypic-backend
+  reqirep ^(.*)${haproxy-conf:bind-incoming}(.*) \1c.pypi.python.org\2
+  rspirep ^(Location:.*)c.pypi.python.org(.*) \1${haproxy-conf:bind-incoming}\2
+  server  pypic-server    c.pypi.python.org:80
+
+
+
+# d.pypi.python.org
+frontend pypid
+  bind ${haproxy-conf:bind-pypid}
+  default_backend pypid-backend
+
+backend pypid-backend
+  reqirep ^(.*)${haproxy-conf:bind-incoming}(.*) \1d.pypi.python.org\2
+  rspirep ^(Location:.*)d.pypi.python.org(.*) \1${haproxy-conf:bind-incoming}\2
+  server  pypid-server    d.pypi.python.org:80
+
+
+
+# e.pypi.python.org
+frontend pypie
+  bind ${haproxy-conf:bind-pypie}
+  default_backend pypie-backend
+
+backend pypie-backend
+  reqirep ^(.*)${haproxy-conf:bind-incoming}(.*) \1e.pypi.python.org\2
+  rspirep ^(Location:.*)e.pypi.python.org(.*) \1${haproxy-conf:bind-incoming}\2
+  server  pypie-server    e.pypi.python.org:80
+
+
+
+# f.pypi.python.org
+frontend pypif
+  bind ${haproxy-conf:bind-pypif}
+  default_backend pypif-backend
+
+backend pypif-backend
+  reqirep ^(.*)${haproxy-conf:bind-incoming}(.*) \1f.pypi.python.org\2
+  rspirep ^(Location:.*)f.pypi.python.org(.*) \1${haproxy-conf:bind-incoming}\2
+  server  pypif-server    f.pypi.python.org:80
