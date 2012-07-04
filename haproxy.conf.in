@@ -41,7 +41,7 @@ backend pypi-mirrors
   # If no session found, use the roundrobin load-balancing algorithm to pick a backend.
   balance roundrobin
   # Use / (the default) for periodic backend health checks
-  option httpchk
+  option httpchk HEAD / HTTP/1.0
 
   # Server options:
   # "cookie" sets the value of the serverid cookie to be used for the server
