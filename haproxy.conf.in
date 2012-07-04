@@ -25,7 +25,7 @@ defaults
   # Enable status page at this URL, on the port HAProxy is bound to
   stats enable
   stats uri /haproxy-status
-  stats refresh 5s
+  stats refresh 5m
   stats realm Haproxy\ statistics
 
 frontend pypi
