@@ -31,9 +31,6 @@ launch the supervisor and HAProxy with it, ``bin/supervisorctl`` to control the
 supervisor or HAProxy instance and finally ``bin/supervisorctl shutdown`` to
 shut down the supervisor and all processes it spawned.
 
-Supervisor is configured to monitor memory usage of all processes and HTTP
-responses of Zope instances.
-
 
 Contributors
 ------------
