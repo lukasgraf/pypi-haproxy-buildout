@@ -1,2 +1,0 @@
-pypi-haproxy-buildout
-=====================

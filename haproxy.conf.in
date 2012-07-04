@@ -1,0 +1,57 @@
+global
+  log 127.0.0.1 local6
+  maxconn  ${haproxy-conf:maxconn}
+  user     ${haproxy-conf:user}
+  group    ${haproxy-conf:group}
+  daemon
+  nbproc 1
+
+defaults
+  mode http
+  option httpclose
+  # Remove requests from the queue if people press stop button
+  option abortonclose
+  # Try to connect this many times on failure
+  retries 3
+  # If a client is bound to a particular backend but it goes down,
+  # send them to a different one
+  option redispatch
+  monitor-uri /haproxy-ping
+
+  timeout connect 7s
+  timeout queue   300s
+  timeout client  300s
+  timeout server  300s
+
+  # Enable status page at this URL, on the port HAProxy is bound to
+  stats enable
+  stats uri /haproxy-status
+  stats refresh 5s
+  stats realm Haproxy\ statistics
+
+frontend pypi
+  bind ${haproxy-conf:bind}
+  default_backend pypi-mirrors
+
+# Load balancing over the zope instances
+backend pypi-mirrors
+  # Add a cookie called "serverid" for maintaining session stickiness.
+  # This cookie lasts until the client's browser closes, and is invisible to Zope.
+  cookie serverid insert nocache indirect
+  # If no session found, use the roundrobin load-balancing algorithm to pick a backend.
+  balance roundrobin
+  # Use / (the default) for periodic backend health checks
+  option httpchk
+
+  # Server options:
+  # "cookie" sets the value of the serverid cookie to be used for the server
+  # "maxconn" is how many connections can be sent to the server at once
+  # "check" enables health checks
+  # "rise 1" means consider Zope up after 1 successful health check
+  server  pypi-main        pypi.python.org:80    cookie ppmain check maxconn 2 rise 1
+  server  pypi-mirror-b    b.pypi.python.org:80  cookie ppb    check maxconn 2 rise 1
+  server  pypi-mirror-c    c.pypi.python.org:80  cookie ppc    check maxconn 2 rise 1
+  server  pypi-mirror-d    d.pypi.python.org:80  cookie ppd    check maxconn 2 rise 1
+  server  pypi-mirror-e    e.pypi.python.org:80  cookie ppe    check maxconn 2 rise 1
+  server  pypi-mirror-f    f.pypi.python.org:80  cookie ppif   check maxconn 2 rise 1
+
