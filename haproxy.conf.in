@@ -64,7 +64,7 @@ frontend pypia
   default_backend pypia-backend
 
 backend pypia-backend
-  reqirep ^(Host:.*)${haproxy-conf:bind-incoming}(.*) \1a.pypi.python.org\2
+  reqirep ^(Host:\s*) \1a.pypi.python.org
   rspirep ^(Location:.*)a.pypi.python.org(.*) \1${haproxy-conf:bind-incoming}\2
   server  pypia-server    a.pypi.python.org:80
 
@@ -80,7 +80,7 @@ frontend pypic
   default_backend pypic-backend
 
 backend pypic-backend
-  reqirep ^(Host:.*)${haproxy-conf:bind-incoming}(.*) \1c.pypi.python.org\2
+  reqirep ^(Host:\s*) \1c.pypi.python.org
   rspirep ^(Location:.*)c.pypi.python.org(.*) \1${haproxy-conf:bind-incoming}\2
   server  pypic-server    c.pypi.python.org:80
 
@@ -92,7 +92,7 @@ frontend pypid
   default_backend pypid-backend
 
 backend pypid-backend
-  reqirep ^(Host:.*)${haproxy-conf:bind-incoming}(.*) \1d.pypi.python.org\2
+  reqirep ^(Host:\s*) \1d.pypi.python.org
   rspirep ^(Location:.*)d.pypi.python.org(.*) \1${haproxy-conf:bind-incoming}\2
   server  pypid-server    d.pypi.python.org:80
 
@@ -104,7 +104,7 @@ frontend pypie
   default_backend pypie-backend
 
 backend pypie-backend
-  reqirep ^(Host:.*)${haproxy-conf:bind-incoming}(.*) \1e.pypi.python.org\2
+  reqirep ^(Host:\s*) \1e.pypi.python.org
   rspirep ^(Location:.*)e.pypi.python.org(.*) \1${haproxy-conf:bind-incoming}\2
   server  pypie-server    e.pypi.python.org:80
 
@@ -116,6 +116,6 @@ frontend pypif
   default_backend pypif-backend
 
 backend pypif-backend
-  reqirep ^(Host:.*)${haproxy-conf:bind-incoming}(.*) \1f.pypi.python.org\2
+  reqirep ^(Host:\s*) \1f.pypi.python.org
   rspirep ^(Location:.*)f.pypi.python.org(.*) \1${haproxy-conf:bind-incoming}\2
   server  pypif-server    f.pypi.python.org:80
